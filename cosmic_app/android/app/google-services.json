@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "864359339710",
+    "project_id": "cosmic-is381",
+    "storage_bucket": "cosmic-is381.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:864359339710:android:2c15147efba6a1eff3f0ef",
+        "android_client_info": {
+          "package_name": "com.example.cosmic"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhYWwImltw2KG7aWSbq34EpBtcus09vmI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:864359339710:android:6a29e0bc449ad2abf3f0ef",
+        "android_client_info": {
+          "package_name": "com.example.midterm_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhYWwImltw2KG7aWSbq34EpBtcus09vmI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

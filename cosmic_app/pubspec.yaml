@@ -1,0 +1,169 @@
+name: midterm_app
+description: "A group project."
+publish_to: 'none'
+
+# Versioning information
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^6.0.3
+  intl: ^0.18.0
+  cupertino_icons: ^1.0.8
+  firebase_core: ^3.8.0
+  cloud_firestore: ^5.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: "^0.14.1"
+  flutter_lints: ^4.0.0
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/icon.png"
+  remove_alpha_ios: true
+
+
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/icon/icon.png
+    - assets/images/zodiac.png
+    - assets/images/tarot.png
+    - assets/images/compa.png
+    - assets/images/topsuit.png
+    - assets/images/toprank.png
+    - assets/images/topcard.png
+    - assets/images/backcard.png
+
+    # 22 major arcana tarot cards
+    - assets/images/tarot/thefool.png
+    - assets/images/tarot/themagician.png
+    - assets/images/tarot/thehighpriestess.png
+    - assets/images/tarot/theempress.png
+    - assets/images/tarot/theemperor.png
+    - assets/images/tarot/thehierophant.png
+    - assets/images/tarot/thechariot.png
+    - assets/images/tarot/strength.png
+    - assets/images/tarot/thehermit.png
+    - assets/images/tarot/wheeloffortune.png
+    - assets/images/tarot/justice.png
+    - assets/images/tarot/thehangedman.png
+    - assets/images/tarot/death.png
+    - assets/images/tarot/temperance.png
+    - assets/images/tarot/thedevil.png
+    - assets/images/tarot/thetower.png
+    - assets/images/tarot/themoon.png
+    - assets/images/tarot/judgement.png
+    - assets/images/tarot/thesun.png
+    - assets/images/tarot/theworld.png
+    - assets/images/tarot/thelovers.png
+    - assets/images/tarot/thestar.png
+
+    # 14 cups
+    - assets/images/tarot/aceofcups.png
+    - assets/images/tarot/twoofcups.png
+    - assets/images/tarot/threeofcups.png
+    - assets/images/tarot/fourofcups.png
+    - assets/images/tarot/fiveofcups.png
+    - assets/images/tarot/sixofcups.png
+    - assets/images/tarot/sevenofcups.png
+    - assets/images/tarot/eightofcups.png
+    - assets/images/tarot/nineofcups.png
+    - assets/images/tarot/tenofcups.png
+    - assets/images/tarot/pageofcups.png
+    - assets/images/tarot/knightofcups.png
+    - assets/images/tarot/queenofcups.png
+    - assets/images/tarot/kingofcups.png
+
+    # 14 pentacles
+    - assets/images/tarot/aceofpentacles.png
+    - assets/images/tarot/twoofpentacles.png
+    - assets/images/tarot/threeofpentacles.png
+    - assets/images/tarot/fourofpentacles.png
+    - assets/images/tarot/fiveofpentacles.png
+    - assets/images/tarot/sixofpentacles.png
+    - assets/images/tarot/sevenofpentacles.png
+    - assets/images/tarot/eightofpentacles.png
+    - assets/images/tarot/nineofpentacles.png
+    - assets/images/tarot/tenofpentacles.png
+    - assets/images/tarot/pageofpentacles.png
+    - assets/images/tarot/knightofpentacles.png
+    - assets/images/tarot/queenofpentacles.png
+    - assets/images/tarot/kingofpentacles.png
+
+    # 14 wands
+    - assets/images/tarot/aceofwands.png
+    - assets/images/tarot/twoofwands.png
+    - assets/images/tarot/threeofwands.png
+    - assets/images/tarot/fourofwands.png
+    - assets/images/tarot/fiveofwands.png
+    - assets/images/tarot/sixofwands.png
+    - assets/images/tarot/sevenofwands.png
+    - assets/images/tarot/eightofwands.png
+    - assets/images/tarot/nineofwands.png
+    - assets/images/tarot/tenofwands.png
+    - assets/images/tarot/knightofwands.png
+    - assets/images/tarot/queenofwands.png
+    - assets/images/tarot/kingofwands.png
+    - assets/images/tarot/pageofwands.png
+
+    # 14 swords
+    - assets/images/tarot/aceofswords.png
+    - assets/images/tarot/twoofswords.png
+    - assets/images/tarot/threeofswords.png
+    - assets/images/tarot/fourofswords.png
+    - assets/images/tarot/fiveofswords.png
+    - assets/images/tarot/sixofswords.png
+    - assets/images/tarot/sevenofswords.png
+    - assets/images/tarot/eightofswords.png
+    - assets/images/tarot/nineofswords.png
+    - assets/images/tarot/tenofswords.png
+    - assets/images/tarot/pageofswords.png
+    - assets/images/tarot/knightofswords.png
+    - assets/images/tarot/queenofswords.png
+    - assets/images/tarot/kingofswords.png
+
+    # Zodiac images
+    - assets/images/zodiac/Gemini.png
+    - assets/images/zodiac/Virgo.png
+    - assets/images/zodiac/Aries.png
+    - assets/images/zodiac/Taurus.png
+    - assets/images/zodiac/Cancer.png
+    - assets/images/zodiac/Leo.png
+    - assets/images/zodiac/Libra.png
+    - assets/images/zodiac/Scorpio.png
+    - assets/images/zodiac/Sagittarius.png
+    - assets/images/zodiac/Capricorn.png
+    - assets/images/zodiac/Aquarius.png
+    - assets/images/zodiac/Pisces.png
+    - assets/images/zodiac/zodiac.png
+    - assets/images/zodiac/lucky.png
+    - assets/images/zodiac/cosmic_show.png
+
+    # Flower images
+    - assets/images/flower/f1.png
+    - assets/images/flower/f2.png
+    - assets/images/flower/f3.png
+    - assets/images/flower/f4.png
+    - assets/images/flower/f5.png
+    - assets/images/flower/f6.png
+    - assets/images/flower/f7.png
+
+  fonts:
+    - family: Piazzolla
+      fonts:
+        - asset: assets/fonts/Piazzolla_18pt-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Piazzolla-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Piazzolla-ExtraBold.ttf
+          weight: 700
