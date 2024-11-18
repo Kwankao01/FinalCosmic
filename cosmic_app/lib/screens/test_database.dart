@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:convert';
 
@@ -70,6 +69,7 @@ class _TestPageState extends State<TestPage> {
     );
   }
 }
+
 class Post {
   int userid;
   String username;
@@ -77,7 +77,8 @@ class Post {
   String zodiacsign;
   String dbId;
 
-  Post(this.userid, this.username, this.birthdate, this.zodiacsign, {this.dbId = ""});
+  Post(this.userid, this.username, this.birthdate, this.zodiacsign,
+      {this.dbId = ""});
 
   // Factory constructor to create a Post from Firestore snapshot
   factory Post.fromSnapshot(Map<String, dynamic> json) {
@@ -128,11 +129,10 @@ abstract class PostService {
   Future<Post> addPost(Post post);
 }
 
-class PostFirebaseService implements PostService{
-
+class PostFirebaseService implements PostService {
   Future<List<Post>> getPosts() async {
-    QuerySnapshot qs = 
-      await FirebaseFirestore.instance.collection('users').get();
+    QuerySnapshot qs =
+        await FirebaseFirestore.instance.collection('users').get();
     AllPosts all = AllPosts.fromSnapshot(qs);
     return all.posts;
   }
@@ -147,9 +147,7 @@ class PostFirebaseService implements PostService{
   void updatePost(Post post) {
     // TODO: implement updatePost
   }
-
 }
-
 
 class PostController {
   List<Post> posts = List.empty();

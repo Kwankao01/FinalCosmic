@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
 import 'home_screen.dart';
 
@@ -37,13 +38,34 @@ class _LoginPageState extends State<LoginScreen> {
     }
   }
 
-  void _start() async {
+  Future<int> _getNextUserId() async {
+    final usersSnapshot =
+        await FirebaseFirestore.instance.collection('users').get();
+    return usersSnapshot.size +
+        1; // Incrementing the size of users collection to get the next user ID.
+  }
+
+  Future<void> _start() async {
     if (_formKey.currentState!.validate() && _selectedDate != null) {
       _formKey.currentState!.save();
 
+      // Get the next user ID
+      final int userId = await _getNextUserId();
+
       // Update user data using Provider
-      Provider.of<UserModel>(context, listen: false)
-          .updateUser(_name, _selectedDate!);
+      final userModel = Provider.of<UserModel>(context, listen: false);
+      userModel.updateUser(_name, _selectedDate!);
+
+      // Format birthdate to "dd-MM-yyyy"
+      String formattedDate = DateFormat('dd-MM-yyyy').format(_selectedDate!);
+
+      // Save user data to Firestore
+      await FirebaseFirestore.instance.collection('users').add({
+        'userid': userId, // Store the dynamically generated user ID
+        'username': userModel.name,
+        'birthdate': formattedDate, // Store birthdate as string
+        'zodiacsign': userModel.zodiacSign,
+      });
 
       // Navigate to HomeScreen
       Navigator.pushReplacement(
@@ -53,7 +75,7 @@ class _LoginPageState extends State<LoginScreen> {
     } else {
       // Show error
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('โปรดใส่ข้อมูลทั้งหมด')),
+        const SnackBar(content: Text('Please fill in all the fields')),
       );
     }
   }
