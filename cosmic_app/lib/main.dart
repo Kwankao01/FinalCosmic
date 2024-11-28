@@ -33,10 +33,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => HistoryModel()),
-        ChangeNotifierProvider(
-            create: (_) => UserModel()),
-        ChangeNotifierProvider(
-            create: (_) => ZodiacModel()),
+        ChangeNotifierProvider(create: (_) => UserModel()),
+        ChangeNotifierProvider(create: (_) => ZodiacModel()),
       ],
       child: MaterialApp(
         title: 'Cosmic App',
@@ -48,7 +46,7 @@ class MyApp extends StatelessWidget {
             foregroundColor: Color(0xFF000000),
           ),
         ),
-        initialRoute: '/login',
+        initialRoute: '/home',
         routes: {
           '/login': (context) => const LoginScreen(),
           '/home': (context) => const HomeScreen(),
@@ -64,8 +62,7 @@ class MyApp extends StatelessWidget {
               chosenCards: [],
             );
           },
-          '/zodiac_show': (context) =>
-              ZodiacShowScreen(zodiacSign: ''),
+          '/zodiac_show': (context) => ZodiacShowScreen(zodiacSign: ''),
           '/test_database': (context) => TestPage(),
         },
       ),

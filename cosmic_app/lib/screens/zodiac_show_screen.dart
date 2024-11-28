@@ -5,8 +5,7 @@ import '../models/user_model.dart';
 class ZodiacShowScreen extends StatelessWidget {
   final String zodiacSign;
 
-  const ZodiacShowScreen({Key? key, required this.zodiacSign})
-      : super(key: key);
+  const ZodiacShowScreen({super.key, required this.zodiacSign});
 
   @override
   Widget build(BuildContext context) {

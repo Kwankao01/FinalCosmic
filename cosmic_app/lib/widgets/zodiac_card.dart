@@ -1,94 +1,106 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import '../screens/zodiac_show_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore package
 
-class ZodiacCard extends StatelessWidget {
-  final String name;
-  final String zodiacSign;
-  final bool dailyHoroStatus; // Corrected field name
+class HoroscopeStatusCard extends StatefulWidget {
+  const HoroscopeStatusCard({super.key});
 
-  const ZodiacCard({
-    super.key,
-    required this.name,
-    required this.zodiacSign,
-    required this.dailyHoroStatus, // Receive dailyHoroStatus
-  });
+  @override
+  State<HoroscopeStatusCard> createState() => _HoroscopeStatusCardState();
+}
+
+class _HoroscopeStatusCardState extends State<HoroscopeStatusCard> {
+  bool hasReadHoroscope = false;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  late DocumentReference _statusRef;
+
+  @override
+  void initState() {
+    super.initState();
+    _statusRef = _firestore
+        .collection('DailyHoroStatus')
+        .doc('Status'); // Firestore reference
+
+    // Listen for real-time updates to Firestore
+    _statusRef.snapshots().listen((snapshot) {
+      if (snapshot.exists) {
+        setState(() {
+          hasReadHoroscope = snapshot['Status'] ?? false;
+        });
+      }
+    });
+  }
+
+  // Function to update Firestore document when the user reads the horoscope
+  void _updateHoroscopeStatus() async {
+    await _statusRef.update({'Status': true}); // Set the status to true
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ZodiacShowScreen(zodiacSign: zodiacSign),
-          ),
-        );
-      },
-      child: Card(
-        elevation: 4,
-        margin: const EdgeInsets.all(16.0),
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Image.asset(
-                'assets/images/zodiac/$zodiacSign.png',
-                width: 100,
-                height: 100,
-                errorBuilder: (context, error, stackTrace) {
-                  return const Icon(
-                    Icons.error,
-                    size: 100,
-                    color: Colors.red,
-                  );
-                },
-              ),
-              const SizedBox(width: 16.0),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      onTap: _updateHoroscopeStatus, // Update status on tap
+      child: StreamBuilder<DocumentSnapshot>(
+        stream: _statusRef.snapshots(), // Listen for real-time updates
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            return const Center(child: Text('No data available'));
+          }
+
+          // Fetch the Status field from Firestore
+          bool status = snapshot.data!['Status'] ?? false;
+
+          return Card(
+            elevation: 4,
+            margin: const EdgeInsets.all(16.0),
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
                 children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Piazzolla',
-                    ),
+                  Icon(
+                    status ? Icons.check_circle : Icons.error,
+                    size: 100,
+                    color: status ? Colors.green : Colors.red,
                   ),
-                  Text(
-                    'You are $zodiacSign !!',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontFamily: 'Piazzolla',
-                    ),
-                  ),
-                  const SizedBox(height: 8.0),
-                  Text(
-                    'Click to see more information',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                      fontFamily: 'Piazzolla',
-                    ),
-                  ),
-                  const SizedBox(height: 8.0),
-                  // Show the daily horoscope status
-                  Text(
-                    dailyHoroStatus
-                        ? 'You’ve read today’s horoscope!'
-                        : 'You haven’t read today’s horoscope yet.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: dailyHoroStatus ? Colors.green : Colors.red,
-                      fontFamily: 'Piazzolla',
-                    ),
+                  const SizedBox(width: 16.0),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Horoscope Status',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Piazzolla',
+                        ),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Text(
+                        status
+                            ? 'You have read your horoscope today!'
+                            : 'You have not read your horoscope today.',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: status ? Colors.green : Colors.red,
+                          fontFamily: 'Piazzolla',
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

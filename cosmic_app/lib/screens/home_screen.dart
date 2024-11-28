@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/user_model.dart';
-import '../widgets/zodiac_card.dart';
+import '../widgets/zodiac_card.dart'; // Import the new HoroscopeStatusCard
 import '../widgets/cosmic_card.dart';
 import '../widgets/moon_card.dart';
 import 'login_screen.dart';
-import 'zodiac_show_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -35,11 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userModel = Provider.of<UserModel>(context);
-    final String zodiacSign = userModel.zodiacSign;
-    final bool dailyHoroStatus =
-        userModel.dailyHoroStatus; // Corrected field name
-
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -97,22 +90,8 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ZodiacShowScreen(zodiacSign: zodiacSign),
-                  ),
-                );
-              },
-              child: ZodiacCard(
-                name: userModel.name,
-                zodiacSign: zodiacSign,
-                dailyHoroStatus: dailyHoroStatus, // Corrected field name
-              ),
-            ),
+            // Replaced ZodiacCard with HoroscopeStatusCard
+            HoroscopeStatusCard(),
             InkWell(
               onTap: () => Navigator.pushNamed(context, '/daily_horoscope'),
               child: MoonCard(),
