@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:midterm_app/models/question_type.dart';
@@ -18,6 +21,7 @@ class _TarotScreenState extends State<TarotScreen> {
   int _currentIndex = 0;
   QuestionType? selectedQuestionType;
   TarotCard? drawnCard;
+  bool drawCard = false;
 
   final _formKey = GlobalKey<FormState>();
   String _userQuestion = '';
@@ -60,6 +64,7 @@ class _TarotScreenState extends State<TarotScreen> {
           child: Column(
             children: [
               _buildQuestionTypeSelector(),
+              
               if (selectedQuestionType != null) _buildQuestionForm(),
               drawnCard == null
                   ? _buildDrawCardButton()
@@ -182,6 +187,13 @@ class _TarotScreenState extends State<TarotScreen> {
       ),
     );
   }
+Widget _DrawCardStatusChangeText(){
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Text(""),
+    );
+
+}
 
   void _submitQuestion() {
     if (_formKey.currentState!.validate()) {
@@ -333,3 +345,98 @@ class _TarotScreenState extends State<TarotScreen> {
     );
   }
 }
+
+class drawCardStatus {
+  bool drawCard;
+  String dbId = "";
+
+  drawCardStatus(this.drawCard);
+  factory drawCardStatus.fromSnapshot(Map<String, dynamic>json){
+    return drawCardStatus(
+      json['drawCard'] as bool? ?? false,
+    );
+  }
+  factory drawCardStatus.fromJson(Map<String, dynamic> json) {
+    return drawCardStatus(
+      json['drawCard'] as bool? ?? false,
+    );
+  }
+}
+
+class DrawCard {
+  final List<drawCardStatus> post;
+  DrawCard(this.post);
+
+ 
+  factory DrawCard.fromSnapshot(QuerySnapshot qs) {
+    List<drawCardStatus> posts = qs.docs.map((DocumentSnapshot ds) {
+      drawCardStatus post = drawCardStatus.fromSnapshot(ds.data() as Map<String, dynamic>);
+      post.dbId = ds.id;
+      return post;
+    }).toList();
+
+    return DrawCard(posts);
+  }
+
+ 
+  factory DrawCard.fromJson(List<dynamic> json) {
+    List<drawCardStatus> posts = json.map((item) => drawCardStatus.fromJson(item)).toList();
+    return DrawCard(posts);
+  }
+}
+
+abstract class PostService {
+  Future<List<drawCardStatus>> getPosts();
+  Future<void> updatePost(drawCardStatus post);
+  Future<drawCardStatus> addPost(drawCardStatus post);
+}
+
+class PostFirebaseService implements PostService {
+  Future<List<drawCardStatus>> getPosts() async {
+    QuerySnapshot qs =
+        await FirebaseFirestore.instance.collection('users').get();
+    DrawCard all = DrawCard.fromSnapshot(qs);
+    return all.post;
+  }
+
+  @override
+  Future<drawCardStatus> addPost(drawCardStatus post) {
+    // TODO: implement addPost
+    throw UnimplementedError();
+  }
+
+ @override
+  Future<void> updatePost(drawCardStatus post)async {
+   
+    try {
+      final postsRef = await FirebaseFirestore.instance
+      .collection("tarotStatus")
+      .doc(post.dbId);
+      await postsRef.update({
+        "drawCard": post.drawCard,
+        "timestamp": FieldValue.serverTimestamp(),
+      });
+      print("DocumentSnapshot updated");
+    }catch(e){
+      print("error update $e");
+    }
+  }
+}
+
+class PostController {
+  List<drawCardStatus> posts = List.empty();
+  final PostService service;
+
+  StreamController<bool> onSyncController = StreamController();
+  Stream<bool> get onSync => onSyncController.stream;
+
+  PostController(this.service);
+
+  Future<List<drawCardStatus>> fetchPosts() async {
+    onSyncController.add(true);
+    posts = await service.getPosts();
+    onSyncController.add(false);
+    return posts;
+  }
+}
+

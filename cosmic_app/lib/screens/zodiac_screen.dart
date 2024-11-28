@@ -25,12 +25,12 @@ void initState() {
     });
   });
   
-  getPosts();
+  _getPosts();
 }
 
 
 
-  void getPosts() async {
+  void _getPosts() async {
     var newPosts = await controller.fetchPosts();
     setState(() {
       posts = newPosts;
