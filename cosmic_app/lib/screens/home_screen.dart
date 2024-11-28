@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../widgets/zodiac_card.dart'; // Import the new HoroscopeStatusCard
-import '../widgets/cosmic_card.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../widgets/zodiac_card.dart';
 import '../widgets/moon_card.dart';
+import '../widgets/cosmic_card.dart';
 import 'login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -66,7 +66,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: const Icon(Icons.logout),
                   tooltip: 'Logout',
                   onPressed: () {
-                    // Navigate back to LoginScreen
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -88,55 +87,86 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Replaced ZodiacCard with HoroscopeStatusCard
-            HoroscopeStatusCard(),
-            InkWell(
-              onTap: () => Navigator.pushNamed(context, '/daily_horoscope'),
-              child: MoonCard(),
-            ),
-            const SizedBox(height: 5),
-            InkWell(
-              onTap: () =>
-                  Navigator.pushNamed(context, '/zodiac', arguments: 'ZODIAC'),
-              child: CosmicCard(
-                title: 'Zodiac',
-                description: 'Cosmic insights tailored to your birth date.',
-                imagePath: 'assets/images/zodiac.png',
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Horoscope Status Card
+              Container(
+                child: const SizedBox(
+                  height: 150, 
+                  child: HoroscopeStatusCard(),
+                ),
               ),
-            ),
-            InkWell(
-              onTap: () =>
-                  Navigator.pushNamed(context, '/tarot', arguments: 'Tarot'),
-              child: CosmicCard(
-                title: 'Tarot',
-                description:
-                    'Mystical card deck that sparks divination and inspires self-discovery.',
-                imagePath: 'assets/images/tarot.png',
+              // Moon Card
+              InkWell(
+                onTap: () async {
+                  try {
+                    await FirebaseFirestore.instance
+                      .collection('DailyHoroStatus')
+                      .doc('Status')
+                       .set({'Status': true}, SetOptions(merge: true));
+                   final result = await Navigator.pushNamed(context, '/daily_horoscope');
+                    if (result == 'refresh') {
+                       setState(() {});
+                     }
+                   } catch (e) {
+                      print('Error updating status: $e');
+                    }
+                  },
+                 child: const MoonCard(),
               ),
-            ),
-            InkWell(
-              onTap: () => Navigator.pushNamed(context, '/compatibility',
-                  arguments: 'COMPATIBILITY'),
-              child: CosmicCard(
-                title: 'Compatibility',
-                description:
-                    'Analyze relationship dynamics based on astrological factors.',
-                imagePath: 'assets/images/compa.png',
+
+              const SizedBox(height: 16),
+              // Zodiac Card
+              InkWell(
+                onTap: () =>
+                    Navigator.pushNamed(context, '/zodiac', arguments: 'ZODIAC'),
+                child: const CosmicCard(
+                  title: 'Zodiac',
+                  description: 'Cosmic insights tailored to your birth date.',
+                  imagePath: 'assets/images/zodiac.png',
+                ),
               ),
-            ),
-            InkWell(
-              onTap: () => Navigator.pushNamed(context, '/test_database',
-                  arguments: 'test_database'),
-              child: CosmicCard(
-                title: 'TestDatabase',
-                description:
-                    'Mystical card deck that sparks divination and inspires self-discovery.',
-                imagePath: 'assets/images/tarot.png',
+              const SizedBox(height: 16),
+              // Tarot Card
+              InkWell(
+                onTap: () =>
+                    Navigator.pushNamed(context, '/tarot', arguments: 'Tarot'),
+                child: const CosmicCard(
+                  title: 'Tarot',
+                  description:
+                      'Mystical card deck that sparks divination and inspires self-discovery.',
+                  imagePath: 'assets/images/tarot.png',
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              // Compatibility Card
+              InkWell(
+                onTap: () => Navigator.pushNamed(context, '/compatibility',
+                    arguments: 'COMPATIBILITY'),
+                child: const CosmicCard(
+                  title: 'Compatibility',
+                  description:
+                      'Analyze relationship dynamics based on astrological factors.',
+                  imagePath: 'assets/images/compa.png',
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Test Database Card
+              InkWell(
+                onTap: () => Navigator.pushNamed(context, '/test_database',
+                    arguments: 'test_database'),
+                child: const CosmicCard(
+                  title: 'TestDatabase',
+                  description:
+                      'Mystical card deck that sparks divination and inspires self-discovery.',
+                  imagePath: 'assets/images/tarot.png',
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(

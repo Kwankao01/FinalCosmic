@@ -200,16 +200,19 @@ class _DailyHoroscopeScreenState extends State<DailyHoroscopeScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          zodiacSign.isNotEmpty ? zodiacSign : 'Horoscope',
-          style: const TextStyle(
-              color: Colors.black, fontSize: 20, fontFamily: 'Piazzolla'),
-        ),
-        centerTitle: true,
+        icon: const Icon(Icons.arrow_back, color: Colors.black),
+        onPressed: () {
+             Navigator.pop(context, 'refresh'); // ส่งค่า 'refresh' กลับไปเมื่อผู้ใช้กดปุ่ม Back
+           },
       ),
+      title: Text(
+        zodiacSign.isNotEmpty ? zodiacSign : 'Horoscope',
+        style: const TextStyle(
+          color: Colors.black, fontSize: 20, fontFamily: 'Piazzolla'),
+      ),
+       centerTitle: true,
+      ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
