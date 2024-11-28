@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:midterm_app/models/question_type.dart';
@@ -18,6 +21,7 @@ class _TarotScreenState extends State<TarotScreen> {
   int _currentIndex = 0;
   QuestionType? selectedQuestionType;
   TarotCard? drawnCard;
+  bool drawCard = false;
 
   final _formKey = GlobalKey<FormState>();
   String _userQuestion = '';

@@ -17,6 +17,7 @@ class _LoginPageState extends State<LoginScreen> {
   String _name = '';
   DateTime? _selectedDate;
 
+  // Date Picker
   Future<void> _selectDate(BuildContext context) async {
     final DateTime initialDate = DateTime(2000);
     final DateTime firstDate = DateTime(1900);
@@ -38,13 +39,14 @@ class _LoginPageState extends State<LoginScreen> {
     }
   }
 
+  // Fetch next user ID
   Future<int> _getNextUserId() async {
     final usersSnapshot =
         await FirebaseFirestore.instance.collection('users').get();
-    return usersSnapshot.size +
-        1; // Incrementing the size of users collection to get the next user ID.
+    return usersSnapshot.size + 1; // Increment size to get the next user ID.
   }
 
+  // Save user details and navigate to the home screen
   Future<void> _start() async {
     if (_formKey.currentState!.validate() && _selectedDate != null) {
       _formKey.currentState!.save();
@@ -52,9 +54,9 @@ class _LoginPageState extends State<LoginScreen> {
       // Get the next user ID
       final int userId = await _getNextUserId();
 
-      // Update user data using Provider
+      // Update user data using Provider (including userId)
       final userModel = Provider.of<UserModel>(context, listen: false);
-      userModel.updateUser(_name, _selectedDate!);
+      userModel.updateUser(_name, _selectedDate!, userId); // Pass userId here
 
       // Format birthdate to "dd-MM-yyyy"
       String formattedDate = DateFormat('dd-MM-yyyy').format(_selectedDate!);
@@ -62,9 +64,10 @@ class _LoginPageState extends State<LoginScreen> {
       // Save user data to Firestore
       await FirebaseFirestore.instance.collection('users').add({
         'userid': userId, // Store the dynamically generated user ID
-        'username': userModel.name,
+        'username': userModel.name, // Store name
         'birthdate': formattedDate, // Store birthdate as string
-        'zodiacsign': userModel.zodiacSign,
+        'zodiacsign': userModel.zodiacSign, // Store zodiac sign
+        'dailyHoroStatus': false, // Default to false
       });
 
       // Navigate to HomeScreen
@@ -73,7 +76,7 @@ class _LoginPageState extends State<LoginScreen> {
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } else {
-      // Show error
+      // Show error if form is incomplete
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all the fields')),
       );

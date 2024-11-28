@@ -5,10 +5,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TestPage extends StatefulWidget {
   @override
-  State<TestPage> createState() => _TestPageState();
+  State<TestPage> createState() => TestPageState();
 }
 
-class _TestPageState extends State<TestPage> {
+class TestPageState extends State<TestPage> {
   List<Post> posts = [];
   bool isLoading = false;
   PostController controller = PostController(PostFirebaseService());
@@ -17,7 +17,7 @@ class _TestPageState extends State<TestPage> {
   void initState() {
     super.initState();
 
-    // Listen for sync state changes
+    
     controller.onSync.listen((bool syncState) {
       setState(() {
         isLoading = syncState;
@@ -25,7 +25,7 @@ class _TestPageState extends State<TestPage> {
     });
   }
 
-  // Fetch posts from Firestore
+ 
   void _getPosts() async {
     var newPosts = await controller.fetchPosts();
     setState(() {
@@ -33,7 +33,7 @@ class _TestPageState extends State<TestPage> {
     });
   }
 
-  // UI for displaying the list of users
+  
   Widget get body => isLoading
       ? CircularProgressIndicator()
       : ListView.builder(
@@ -79,7 +79,7 @@ class Post {
   Post(this.userid, this.username, this.birthdate, this.zodiacsign,
       {this.dbId = ""});
 
-  // Factory constructor to create a Post from Firestore snapshot
+  
   factory Post.fromSnapshot(Map<String, dynamic> json) {
     return Post(
       json['userid'] ?? 0,
@@ -89,7 +89,7 @@ class Post {
     );
   }
 
-  // Factory constructor to create a Post from JSON data
+  
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
       json['userid'] ?? 0,
@@ -104,7 +104,7 @@ class AllPosts {
   final List<Post> posts;
   AllPosts(this.posts);
 
-  // Factory constructor to create AllPosts from a Firestore QuerySnapshot
+ 
   factory AllPosts.fromSnapshot(QuerySnapshot qs) {
     List<Post> posts = qs.docs.map((DocumentSnapshot ds) {
       Post post = Post.fromSnapshot(ds.data() as Map<String, dynamic>);
@@ -115,7 +115,7 @@ class AllPosts {
     return AllPosts(posts);
   }
 
-  // Factory constructor to create AllPosts from JSON data
+ 
   factory AllPosts.fromJson(List<dynamic> json) {
     List<Post> posts = json.map((item) => Post.fromJson(item)).toList();
     return AllPosts(posts);

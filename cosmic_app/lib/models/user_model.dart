@@ -5,20 +5,40 @@ class UserModel extends ChangeNotifier {
   DateTime? _birthDate;
   String _zodiacSign = '';
   String _zodiacImage = '';
+  bool _dailyHoroStatus = false;
+  int _userId = 0; // New field for userId
 
+  // Getters
   String get name => _name;
   DateTime? get birthDate => _birthDate;
   String get zodiacSign => _zodiacSign;
   String get zodiacImage => _zodiacImage;
+  bool get dailyHoroStatus => _dailyHoroStatus;
+  int get userId => _userId; // Getter for userId
 
-  void updateUser(String name, DateTime birthDate) {
+  // Update user details
+  void updateUser(String name, DateTime birthDate, int userId) {
     _name = name;
     _birthDate = birthDate;
     _zodiacSign = _calculateZodiacSign(birthDate);
     _zodiacImage = 'assets/images/zodiac/$_zodiacSign.png';
+    _userId = userId; // Update the userId
     notifyListeners();
   }
 
+  // Update daily horoscope status
+  void updateDailyHoroStatus(bool status) {
+    _dailyHoroStatus = status;
+    notifyListeners();
+  }
+
+  // Reset daily horoscope status at the start of a new day
+  void resetDailyHoroStatus() {
+    _dailyHoroStatus = false;
+    notifyListeners();
+  }
+
+  // Calculate Zodiac Sign
   String _calculateZodiacSign(DateTime date) {
     int month = date.month;
     int day = date.day;
@@ -49,5 +69,11 @@ class UserModel extends ChangeNotifier {
       return 'Pisces';
     }
     return '';
+  }
+
+  // Method to update userId
+  void updateUserId(int userId) {
+    _userId = userId;
+    notifyListeners();
   }
 }

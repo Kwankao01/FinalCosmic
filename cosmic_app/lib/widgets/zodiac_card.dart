@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
-import '../screens/zodiac_show_screen.dart'; // Ensure this import is correct
+import '../screens/zodiac_show_screen.dart';
 
 class ZodiacCard extends StatelessWidget {
   final String name;
   final String zodiacSign;
+  final bool dailyHoroStatus; // Corrected field name
 
-  const ZodiacCard({super.key, required this.name, required this.zodiacSign});
+  const ZodiacCard({
+    super.key,
+    required this.name,
+    required this.zodiacSign,
+    required this.dailyHoroStatus, // Receive dailyHoroStatus
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,24 +20,22 @@ class ZodiacCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                ZodiacShowScreen(zodiacSign: zodiacSign), // Pass zodiacSign
+            builder: (context) => ZodiacShowScreen(zodiacSign: zodiacSign),
           ),
         );
       },
       child: Card(
         elevation: 4,
         margin: const EdgeInsets.all(16.0),
-        color: Colors.white, // Set background color to white
+        color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              // Enlarged Zodiac sign image
               Image.asset(
-                'assets/images/zodiac/$zodiacSign.png', // Updated path for images
-                width: 100, // Adjust width here to enlarge
-                height: 100, // Adjust height here to enlarge
+                'assets/images/zodiac/$zodiacSign.png',
+                width: 100,
+                height: 100,
                 errorBuilder: (context, error, stackTrace) {
                   return const Icon(
                     Icons.error,
@@ -41,33 +45,43 @@ class ZodiacCard extends StatelessWidget {
                 },
               ),
               const SizedBox(width: 16.0),
-              // Display user's name, Zodiac sign, and additional info with 'Piazzolla' font
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    name, // User's name
+                    name,
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Piazzolla', // Apply 'Piazzolla' font
+                      fontFamily: 'Piazzolla',
                     ),
                   ),
                   Text(
-                    'You are $zodiacSign !!', // User's Zodiac sign
+                    'You are $zodiacSign !!',
                     style: const TextStyle(
                       fontSize: 20,
-                      fontFamily: 'Piazzolla', // Apply 'Piazzolla' font
+                      fontFamily: 'Piazzolla',
                     ),
                   ),
                   const SizedBox(height: 8.0),
                   Text(
-                    'Click to see more information', // Additional text
+                    'Click to see more information',
                     style: const TextStyle(
                       fontSize: 14,
-                      color: Colors
-                          .grey, // Set the color to grey for a subtle look
-                      fontFamily: 'Piazzolla', // Apply 'Piazzolla' font
+                      color: Colors.grey,
+                      fontFamily: 'Piazzolla',
+                    ),
+                  ),
+                  const SizedBox(height: 8.0),
+                  // Show the daily horoscope status
+                  Text(
+                    dailyHoroStatus
+                        ? 'You’ve read today’s horoscope!'
+                        : 'You haven’t read today’s horoscope yet.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: dailyHoroStatus ? Colors.green : Colors.red,
+                      fontFamily: 'Piazzolla',
                     ),
                   ),
                 ],

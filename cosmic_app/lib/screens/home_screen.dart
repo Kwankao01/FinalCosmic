@@ -4,7 +4,7 @@ import '../models/user_model.dart';
 import '../widgets/zodiac_card.dart';
 import '../widgets/cosmic_card.dart';
 import '../widgets/moon_card.dart';
-import 'login_screen.dart'; // Import the LoginScreen
+import 'login_screen.dart';
 import 'zodiac_show_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -37,6 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final userModel = Provider.of<UserModel>(context);
     final String zodiacSign = userModel.zodiacSign;
+    final bool dailyHoroStatus =
+        userModel.dailyHoroStatus; // Corrected field name
 
     return Scaffold(
       appBar: AppBar(
@@ -66,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                height: 24, // Reduce the icon size to fit within the AppBar
+                height: 24,
                 child: IconButton(
                   icon: const Icon(Icons.logout),
                   tooltip: 'Logout',
@@ -84,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const Text(
                 'Logout',
                 style: TextStyle(
-                  fontSize: 10, // Reduce font size to fit within the AppBar
+                  fontSize: 10,
                   color: Colors.black,
                 ),
               ),
@@ -108,6 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: ZodiacCard(
                 name: userModel.name,
                 zodiacSign: zodiacSign,
+                dailyHoroStatus: dailyHoroStatus, // Corrected field name
               ),
             ),
             InkWell(
@@ -115,7 +118,6 @@ class _HomeScreenState extends State<HomeScreen> {
               child: MoonCard(),
             ),
             const SizedBox(height: 5),
-
             InkWell(
               onTap: () =>
                   Navigator.pushNamed(context, '/zodiac', arguments: 'ZODIAC'),
@@ -146,8 +148,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             InkWell(
-              onTap: () =>
-                  Navigator.pushNamed(context, '/test_database', arguments: 'test_database'),
+              onTap: () => Navigator.pushNamed(context, '/test_database',
+                  arguments: 'test_database'),
               child: CosmicCard(
                 title: 'TestDatabase',
                 description:
