@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../widgets/zodiac_card.dart'; // Import the new HoroscopeStatusCard
+import '../widgets/horoscope_status_card.dart';
 import '../widgets/cosmic_card.dart';
 import '../widgets/moon_card.dart';
 import 'login_screen.dart';
@@ -66,7 +66,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: const Icon(Icons.logout),
                   tooltip: 'Logout',
                   onPressed: () {
-                    // Navigate back to LoginScreen
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -90,10 +89,13 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Replaced ZodiacCard with HoroscopeStatusCard
-            HoroscopeStatusCard(),
+            const HoroscopeStatusCard(),
             InkWell(
-              onTap: () => Navigator.pushNamed(context, '/daily_horoscope'),
+              onTap: () {
+                // Update horoscope status when MoonCard is tapped
+                HoroscopeStatusCard.updateStatus(context);
+                Navigator.pushNamed(context, '/daily_horoscope');
+              },
               child: MoonCard(),
             ),
             const SizedBox(height: 5),
