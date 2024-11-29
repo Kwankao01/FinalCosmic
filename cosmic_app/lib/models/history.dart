@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CardDraw {
   final String cardName;
@@ -6,9 +6,11 @@ class CardDraw {
   final DateTime drawDate;
   final String questionType;
   final String image;
-  final String keyword;
-  final String definition;
+  final String general;
+  final String love;
+  final String career;
   final String userQuestion;
+  final double? accuracy;
 
   CardDraw({
     required this.cardName,
@@ -16,42 +18,41 @@ class CardDraw {
     required this.drawDate,
     required this.questionType,
     required this.image,
-    required this.keyword,
-    required this.definition,
+    required this.general,
+    required this.love,
+    required this.career,
     required this.userQuestion,
+    this.accuracy,
   });
-}
 
-class HistoryModel extends ChangeNotifier {
-  List<CardDraw> _cardHistory = [];
-
-  List<CardDraw> get cardHistory => _cardHistory;
-
-  void addCardToHistory(
-    String cardName,
-    String cardSuit,
-    DateTime date,
-    String questionType,
-    String image,
-    String keyword,
-    String definition,
-    String userQuestion,
-  ) {
-    _cardHistory.add(CardDraw(
-      cardName: cardName,
-      cardSuit: cardSuit,
-      drawDate: date,
-      questionType: questionType,
-      image: image,
-      keyword: keyword,
-      definition: definition,
-      userQuestion: userQuestion,
-    ));
-    notifyListeners();
+  factory CardDraw.fromFirestore(Map<String, dynamic> data) {
+    return CardDraw(
+      cardName: data['cardName'] ?? '',
+      cardSuit: data['cardSuit'] ?? '',
+      drawDate: (data['drawDate'] as Timestamp).toDate(),
+      questionType: data['questionType'] ?? '',
+      image: data['image'] ?? '',
+      general: data['general'] ?? '',
+      love: data['love'] ?? '',
+      career: data['career'] ?? '',
+      userQuestion: data['userQuestion'] ?? '',
+      accuracy: data['accuracy'] == 0 ? null : data['accuracy']?.toDouble(),
+    );
   }
 
-  void clearHistory() {
-    _cardHistory.clear();
-    notifyListeners();
+  // แปลง CardDraw เป็น Map สำหรับเก็บใน Firestore
+  Map<String, dynamic> toMap() {
+    return {
+      'cardName': cardName,
+      'cardSuit': cardSuit,
+      'drawDate': drawDate,
+      'questionType': questionType,
+      'image': image,
+      'general': general,
+      'love': love,
+      'career': career,
+      'userQuestion': userQuestion,
+      'accuracy': accuracy,
+    };
   }
 }

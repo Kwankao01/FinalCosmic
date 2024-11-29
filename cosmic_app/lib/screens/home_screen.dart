@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:midterm_app/providers/HoroscopeStatusProvider.dart';
 import 'package:provider/provider.dart';
-import '../widgets/horoscope_status_card.dart';
+import 'package:midterm_app/widgets/horoscope_status_card.dart'; // Horoscope Status Card Widget
 import '../widgets/cosmic_card.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/moon_card.dart';
 import 'login_screen.dart';
 
@@ -33,134 +35,159 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Row(
-          children: [
-            Image.asset(
-              'assets/icon/icon.png',
-              width: 30,
-              height: 30,
-            ),
-            const SizedBox(width: 10),
-            const Text(
-              'Cosmic',
-              style: TextStyle(
-                fontFamily: 'Piazzolla',
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: const Color(0xFFf4e5d0),
-        actions: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+    return ChangeNotifierProvider(
+      create: (_) => HoroscopeStatusProvider(),
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Row(
             children: [
-              SizedBox(
-                height: 24,
-                child: IconButton(
-                  icon: const Icon(Icons.logout),
-                  tooltip: 'Logout',
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginScreen()),
-                    );
-                  },
-                ),
+              Image.asset(
+                'assets/icon/icon.png',
+                width: 30,
+                height: 30,
               ),
-              const SizedBox(height: 6),
+              const SizedBox(width: 10),
               const Text(
-                'Logout',
+                'Cosmic',
                 style: TextStyle(
-                  fontSize: 10,
+                  fontFamily: 'Piazzolla',
                   color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const HoroscopeStatusCard(),
-            InkWell(
-              onTap: () {
-                // Update horoscope status when MoonCard is tapped
-                HoroscopeStatusCard.updateStatus(context);
-                Navigator.pushNamed(context, '/daily_horoscope');
-              },
-              child: MoonCard(),
-            ),
-            const SizedBox(height: 5),
-            InkWell(
-              onTap: () =>
-                  Navigator.pushNamed(context, '/zodiac', arguments: 'ZODIAC'),
-              child: CosmicCard(
-                title: 'Zodiac',
-                description: 'Cosmic insights tailored to your birth date.',
-                imagePath: 'assets/images/zodiac.png',
-              ),
-            ),
-            InkWell(
-              onTap: () =>
-                  Navigator.pushNamed(context, '/tarot', arguments: 'Tarot'),
-              child: CosmicCard(
-                title: 'Tarot',
-                description:
-                    'Mystical card deck that sparks divination and inspires self-discovery.',
-                imagePath: 'assets/images/tarot.png',
-              ),
-            ),
-            InkWell(
-              onTap: () => Navigator.pushNamed(context, '/compatibility',
-                  arguments: 'COMPATIBILITY'),
-              child: CosmicCard(
-                title: 'Compatibility',
-                description:
-                    'Analyze relationship dynamics based on astrological factors.',
-                imagePath: 'assets/images/compa.png',
-              ),
-            ),
-            InkWell(
-              onTap: () => Navigator.pushNamed(context, '/test_database',
-                  arguments: 'test_database'),
-              child: CosmicCard(
-                title: 'TestDatabase',
-                description:
-                    'Mystical card deck that sparks divination and inspires self-discovery.',
-                imagePath: 'assets/images/tarot.png',
-              ),
+          backgroundColor: const Color(0xFFf4e5d0),
+          actions: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 24,
+                  child: IconButton(
+                    icon: const Icon(Icons.logout),
+                    tooltip: 'Logout',
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginScreen()),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Logout',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFFF0EBE5),
-        selectedItemColor: const Color(0xFF735688),
-        unselectedItemColor: const Color.fromARGB(255, 123, 122, 122),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Horoscope Status Card
+                Consumer<HoroscopeStatusProvider>(
+                  builder: (context, provider, child) {
+                    return HoroscopeStatusCard();
+                  },
+                ),
+                // Moon Card
+                InkWell(
+                  onTap: () async {
+                    try {
+                      // Update Firestore status
+                      await FirebaseFirestore.instance
+                          .collection('DailyHoroStatus')
+                          .doc('Status')
+                          .set({'Status': true}, SetOptions(merge: true));
+                      final result = await Navigator.pushNamed(
+                          context, '/daily_horoscope');
+                      if (result == 'refresh') {
+                        setState(() {});
+                      }
+
+                      // Update the horoscope status using the provider
+                      Provider.of<HoroscopeStatusProvider>(context,
+                              listen: false)
+                          .markAsRead();
+                    } catch (e) {
+                      print('Error updating status: $e');
+                    }
+                  },
+                  child: const MoonCard(),
+                ),
+                const SizedBox(height: 16),
+                // Tarot Card
+                InkWell(
+                  onTap: () => Navigator.pushNamed(context, '/tarot',
+                      arguments: 'Tarot'),
+                  child: const CosmicCard(
+                    title: 'Tarot',
+                    description:
+                        'Mystical card deck that sparks divination and inspires self-discovery.',
+                    imagePath: 'assets/images/tarot.png',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Compatibility Card
+                InkWell(
+                  onTap: () => Navigator.pushNamed(context, '/compatibility',
+                      arguments: 'COMPATIBILITY'),
+                  child: const CosmicCard(
+                    title: 'Compatibility',
+                    description:
+                        'Analyze relationship dynamics based on astrological factors.',
+                    imagePath: 'assets/images/compa.png',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Test Database Card
+                InkWell(
+                  onTap: () => Navigator.pushNamed(context, '/test_database',
+                      arguments: 'test_database'),
+                  child: const CosmicCard(
+                    title: 'TestDatabase',
+                    description:
+                        'Mystical card deck that sparks divination and inspires self-discovery.',
+                    imagePath: 'assets/images/tarot.png',
+                  ),
+                ),
+              ],
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.menu_book),
-            label: 'Journal',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-        currentIndex: _currentIndex,
-        onTap: _onItemTapped,
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: const Color(0xFFF0EBE5),
+          selectedItemColor: const Color(0xFF735688),
+          unselectedItemColor: const Color.fromARGB(255, 123, 122, 122),
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.menu_book),
+              label: 'Journal',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+          ],
+          currentIndex: _currentIndex,
+          onTap: _onItemTapped,
+        ),
       ),
     );
   }

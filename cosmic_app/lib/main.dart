@@ -32,7 +32,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => HistoryModel()),
         ChangeNotifierProvider(create: (_) => UserModel()),
         ChangeNotifierProvider(create: (_) => ZodiacModel()),
       ],
@@ -50,7 +49,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/login': (context) => const LoginScreen(),
           '/home': (context) => const HomeScreen(),
-          '/history': (context) => const HistoryScreen(),
+          '/history': (context) => HistoryScreen(),
           '/daily_horoscope': (context) => const DailyHoroscopeScreen(),
           '/tarot': (context) => const TarotScreen(title: 'Tarot'),
           '/tarot_result': (context) => const result_screen.TarotResultScreen(),
