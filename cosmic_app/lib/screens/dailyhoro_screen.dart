@@ -69,9 +69,9 @@ class _DailyHoroscopeScreenState extends State<DailyHoroscopeScreen> {
       setState(() {
         dailyHoroscopeData = snapshot.docs.map((doc) {
           return {
-            'aspect': doc['aspect'],
-            'horoid': doc['horoid'],
-            'status': doc['status'],
+            'aspect': doc['aspect'] as String, // Ensure this is a string
+            'horoid': doc['horoid'] as int, // Explicitly cast as int
+            'status': doc['status'] as bool, // Explicitly cast as bool
           };
         }).toList();
 
@@ -114,6 +114,7 @@ class _DailyHoroscopeScreenState extends State<DailyHoroscopeScreen> {
 
         // Save to Firebase
         try {
+          // Add horoscope to history
           await FirebaseFirestore.instance
               .collection('DailyHoroscopeHistory')
               .add({
@@ -121,9 +122,22 @@ class _DailyHoroscopeScreenState extends State<DailyHoroscopeScreen> {
             'Horoscope': selectedHoroscope,
             'Aspect': aspect,
           });
-          print('Horoscope saved to Firebase');
+
+          // Update status in DailyHoroscope collection
+          await FirebaseFirestore.instance
+              .collection('DailyHoroscope')
+              .where('aspect', isEqualTo: aspect)
+              .get()
+              .then((snapshot) {
+            for (var doc in snapshot.docs) {
+              doc.reference
+                  .update({'status': true}); // Update status as boolean
+            }
+          });
+
+          print('Horoscope saved and status updated successfully');
         } catch (e) {
-          print('Error saving horoscope: $e');
+          print('Error saving horoscope or updating status: $e');
         }
       } else {
         setState(() {
@@ -138,11 +152,26 @@ class _DailyHoroscopeScreenState extends State<DailyHoroscopeScreen> {
     }
   }
 
-  void _refreshPage() {
+  void _refreshPage() async {
     setState(() {
       clickedButtons.clear();
       displayedHoroscopes.clear();
     });
+
+    try {
+      // Fetch all documents in the DailyHoroscope collection
+      final QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('DailyHoroscope').get();
+
+      // Update the status field of each document to false
+      for (var doc in snapshot.docs) {
+        await doc.reference.update({'status': false});
+      }
+
+      print('All statuses reset to false');
+    } catch (e) {
+      print('Error resetting statuses: $e');
+    }
   }
 
   @override
@@ -328,10 +357,13 @@ class _HoroscopeHistoryPageState extends State<HoroscopeHistoryPage> {
 
       setState(() {
         horoscopeHistory = snapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>; // Cast to a map
           return {
-            'Date': doc['Date'],
-            'Horoscope': doc['Horoscope'],
-            'Aspect': doc['Aspect'],
+            'Date': data['Date'] != null
+                ? (data['Date'] as Timestamp).toDate()
+                : null,
+            'Horoscope': data['Horoscope'] ?? 'No horoscope available',
+            'Aspect': data['Aspect'] ?? 'No aspect specified',
           };
         }).toList();
         _isLoading = false;
@@ -342,6 +374,11 @@ class _HoroscopeHistoryPageState extends State<HoroscopeHistoryPage> {
       });
       print('Error fetching history: $e');
     }
+  }
+
+  String formatDate(DateTime date) {
+    // Format DateTime to a more readable format
+    return "${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}";
   }
 
   @override
@@ -357,15 +394,34 @@ class _HoroscopeHistoryPageState extends State<HoroscopeHistoryPage> {
               itemBuilder: (context, index) {
                 var history = horoscopeHistory[index];
                 return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  child: ListTile(
-                    title: Text(history['Aspect']),
-                    subtitle: Text(history['Horoscope']),
-                    trailing: Text(
-                      (history['Date'] as Timestamp)
-                          .toDate()
-                          .toLocal()
-                          .toString(),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Aspect: ${history['Aspect']}",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          "Horoscope: ${history['Horoscope']}",
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          "Date: ${formatDate(history['Date'])}",
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 );

@@ -10,27 +10,17 @@ class TarotService {
 
   Future<TarotCard?> getRandomCard() async {
     try {
-      print("Fetching cards from Firestore...");
-
       QuerySnapshot snapshot = await _firestore.collection('tarot').get();
-      print("Found ${snapshot.docs.length} cards");
 
-      if (snapshot.docs.isEmpty) {
-        print("No cards found in collection");
-        return null;
-      }
+      if (snapshot.docs.isEmpty) return null;
 
       final random = Random();
       final randomDoc = snapshot.docs[random.nextInt(snapshot.docs.length)];
-      print("Selected card ID: ${randomDoc.id}");
-
       final data = randomDoc.data() as Map<String, dynamic>;
-      print("Card data: $data");
 
       TarotCard card = TarotCard.fromSnapshot(data);
       card.dbId = randomDoc.id;
 
-      print("Successfully created TarotCard object");
       return card;
     } catch (e, stackTrace) {
       print("Error getting random card: $e");
@@ -49,7 +39,6 @@ class TarotScreen extends StatefulWidget {
 }
 
 class _TarotScreenState extends State<TarotScreen> {
-  int _currentIndex = 0;
   TarotCard? drawnCard;
   bool isLoading = false;
 
@@ -86,7 +75,7 @@ class _TarotScreenState extends State<TarotScreen> {
 
     try {
       final card = await _tarotService.getRandomCard();
-      if (card != null && card.name.isNotEmpty && card.image.isNotEmpty) {
+      if (card != null) {
         setState(() {
           drawnCard = card;
         });
@@ -108,6 +97,37 @@ class _TarotScreenState extends State<TarotScreen> {
         isLoading = false;
       });
     }
+  }
+
+  void _navigateToResultScreen() async {
+    if (drawnCard == null) return;
+
+    final historyService = HistoryService();
+    await historyService
+        .saveReading(
+      cardName: drawnCard!.name,
+      cardSuit: drawnCard!.suit,
+      drawDate: DateTime.now(),
+      questionType: "",
+      image: drawnCard!.image,
+      general: drawnCard!.general,
+      love: drawnCard!.love,
+      career: drawnCard!.career,
+      userQuestion: _userQuestion,
+      accuracy: 0,
+    )
+        .catchError((error) {
+      print("Error saving history: $error");
+    });
+
+    Navigator.pushNamed(
+      context,
+      '/tarot_result',
+      arguments: {
+        'tarotid': drawnCard!.dbId,
+        'userQuestion': _userQuestion,
+      },
+    );
   }
 
   @override
@@ -216,38 +236,5 @@ class _TarotScreenState extends State<TarotScreen> {
         ],
       ),
     );
-  }
-
-  void _navigateToResultScreen() {
-    if (drawnCard == null) return;
-
-    // ส่งผู้ใช้ไปที่หน้าผลลัพธ์ทันที
-    Navigator.pushNamed(
-      context,
-      '/tarot_result',
-      arguments: {
-        'tarotid': drawnCard!.dbId,
-        'userQuestion': _userQuestion,
-      },
-    ).then((_) => _resetScreen());
-
-    // บันทึกข้อมูลลง Firebase โดยไม่รบกวน UI
-    final historyService = HistoryService();
-    historyService
-        .saveReading(
-      cardName: drawnCard!.name,
-      cardSuit: drawnCard!.suit,
-      drawDate: DateTime.now(),
-      questionType: "",
-      image: drawnCard!.image,
-      general: drawnCard!.general,
-      love: drawnCard!.love,
-      career: drawnCard!.career,
-      userQuestion: _userQuestion,
-      accuracy: 0,
-    )
-        .catchError((error) {
-      print("Error saving history: $error");
-    });
   }
 }

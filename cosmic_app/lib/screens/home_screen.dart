@@ -128,7 +128,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: const MoonCard(),
                 ),
                 const SizedBox(height: 16),
-                // Tarot Card
+                InkWell(
+                  onTap: () => Navigator.pushNamed(context, '/zodiac',
+                      arguments: 'ZODIAC'),
+                  child: const CosmicCard(
+                      title: 'Zodiac',
+                      description: 'Cosmic insight tailored to your birth date',
+                      imagePath: 'assets/images/zodiac.png'),
+                ), // Tarot Card
                 InkWell(
                   onTap: () => Navigator.pushNamed(context, '/tarot',
                       arguments: 'Tarot'),
